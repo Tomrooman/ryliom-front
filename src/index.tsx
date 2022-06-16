@@ -1,12 +1,16 @@
-import React from 'react';
-
 import dotenv from 'dotenv';
+
+import React from 'react';
 import ReactDOM from 'react-dom';
 
-import './index.css';
+import axios from 'axios';
+
 import App from './App';
+import './index.css';
 
 dotenv.config();
+
+axios.defaults.baseURL = 'http://localhost:3001';
 
 ReactDOM.render(
   <React.StrictMode>

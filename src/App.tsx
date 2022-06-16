@@ -1,11 +1,9 @@
 import React, { FC, ReactElement } from 'react';
+import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
-
-import TradesComponents from './components/TradesComponent/TradesComponent';
 import './App.css';
+import { TradesComponent } from './components/TradesComponent/TradesComponent';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type AppProps = {};
 
 const App: FC<AppProps> = () => {
@@ -22,7 +20,7 @@ const App: FC<AppProps> = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/trades" element={<TradesComponents />} />
+        <Route path="/trades" element={<TradesComponent />} />
       </Routes>
     </Router>
   );

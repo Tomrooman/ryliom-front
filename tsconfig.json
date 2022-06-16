@@ -3,6 +3,7 @@
     "src/*"
   ],
   "compilerOptions": {
+    "outDir": "./dist/",
     "target": "es5",
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
