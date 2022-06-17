@@ -1,9 +1,8 @@
-import dotenv from 'dotenv';
-
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import axios from 'axios';
+import dotenv from 'dotenv';
+import ReactDOM from 'react-dom';
 
 import App from './App';
 import './index.css';

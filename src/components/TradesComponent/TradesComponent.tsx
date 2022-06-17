@@ -1,9 +1,8 @@
-import { ColorType, createChart } from 'lightweight-charts';
-import moment from 'moment';
-
 import React, { FC, useEffect, useRef, useState } from 'react';
 
 import axios from 'axios';
+import { ColorType, createChart } from 'lightweight-charts';
+import moment from 'moment';
 
 import { Candle } from '../../@types/candle';
 import style from './TradesComponent.module.css';
@@ -41,7 +40,8 @@ export const ChartComponent: FC<ChartsProps> = (props) => {
     });
     chart.timeScale().fitContent();
 
-    const newSeries = chart.addAreaSeries({ lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
+    // const newSeries = chart.addAreaSeries({ lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
+    const newSeries = chart.addCandlestickSeries();
     newSeries.setData(data);
 
     window.addEventListener('resize', handleResize);
@@ -69,27 +69,26 @@ const initialData = [
   { time: '2018-12-31', value: 22.67 },
 ];
 
-type AppProps = {};
-export const TradesComponent: FC<AppProps> = () => {
+export const TradesComponent: FC = () => {
   const [chartsData, setChartsData] = useState<
-    [string, string | number, string | number, string | number, string | number][]
+    { time: string; open: number; high: number; low: number; close: number }[]
   >([]);
 
   useEffect(() => {
-    // getCandles();
+    getCandles();
   }, []);
 
   const getCandles = async () => {
     const { data }: { data: Candle[] } = await axios.get('/candles');
     console.log('candle data : ', data);
     setChartsData(
-      data.map((d) => [
-        moment(Number(d.start_at) * 1000).format('DD/MM/YYYY HH:mm:ss'),
-        Number(d.low),
-        Number(d.open),
-        Number(d.close),
-        Number(d.high),
-      ]),
+      data.map((d) => ({
+        time: moment(Number(d.start_at) * 1000).format('DD/MM/YYYY HH:mm:ss'),
+        open: Number(d.open),
+        high: Number(d.high),
+        low: Number(d.low),
+        close: Number(d.close),
+      })),
     );
   };
 
@@ -103,6 +102,6 @@ export const TradesComponent: FC<AppProps> = () => {
         areaBottomColor: 'rgba(41, 98, 255, 0.28)',
       }}
       data={initialData}
-    ></ChartComponent>
+    />
   );
 };

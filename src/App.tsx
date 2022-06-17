@@ -1,21 +1,20 @@
 import React, { FC, ReactElement } from 'react';
+
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import './App.css';
 import { TradesComponent } from './components/TradesComponent/TradesComponent';
 
-type AppProps = {};
+const Home = (): ReactElement => {
+  return (
+    <div>
+      <h1>Test home</h1>
+      <Link to="/trades">Trades</Link>
+    </div>
+  );
+};
 
-const App: FC<AppProps> = () => {
-  const Home = (): ReactElement => {
-    return (
-      <div>
-        <h1>Test home</h1>
-        <Link to="/trades">Trades</Link>
-      </div>
-    );
-  };
-
+const App: FC = () => {
   return (
     <Router>
       <Routes>
