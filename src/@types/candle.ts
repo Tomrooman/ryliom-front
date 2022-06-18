@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 export type Candle = {
   close: string;
   high: string;
