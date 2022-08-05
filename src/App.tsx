@@ -3,13 +3,13 @@ import React, { FC, ReactElement } from 'react';
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import './App.css';
-import { TradesComponent } from './components/TradesComponent/TradesComponent';
+import AnalyzeComponent from './components/AnalyzeComponent/AnalyzeComponent';
 
 const Home = (): ReactElement => {
   return (
     <div>
       <h1>Test home</h1>
-      <Link to="/trades">Trades</Link>
+      <Link to="/analyze">Analyze</Link>
     </div>
   );
 };
@@ -19,7 +19,7 @@ const App: FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/trades" element={<TradesComponent />} />
+        <Route path="/analyze" element={<AnalyzeComponent />} />
       </Routes>
     </Router>
   );
