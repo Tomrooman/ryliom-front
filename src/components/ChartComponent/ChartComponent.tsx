@@ -43,7 +43,7 @@ const ChartComponent: FC<ChartsProps> = (props) => {
 
       chart.remove();
     };
-  }, [data, type, seriesOptions, chartsOptions]);
+  }, [data, type, height, seriesOptions, chartsOptions]);
 
   return <div ref={chartContainerRef} />;
 };
