@@ -4,7 +4,7 @@
   "singleQuote": true,
   "printWidth": 120,
   "tabWidth": 2,
-  "importOrder": ["^react$", "^[a-zA-Z-]+", "^[.]"],
+  "importOrder": ["^react$", "^[@a-zA-Z-]+", "^[.]"],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
 }

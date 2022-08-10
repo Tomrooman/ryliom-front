@@ -51,15 +51,13 @@ const AnalyzeComponent: FC = () => {
 
   const getCandles = async () => {
     const { data }: { data: Candle[] } = await axios.get(`/candles/${currentPage}`);
-    const formattedData = data.map((d) => {
-      return {
-        time: Number(d.start_at),
-        open: Number(d.open),
-        high: Number(d.high),
-        low: Number(d.low),
-        close: Number(d.close),
-      };
-    });
+    const formattedData = data.map((d) => ({
+      time: Number(d.start_at),
+      open: Number(d.open),
+      high: Number(d.high),
+      low: Number(d.low),
+      close: Number(d.close),
+    }));
     setChartsData(formattedData);
   };
 

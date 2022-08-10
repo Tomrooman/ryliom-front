@@ -1,13 +1,10 @@
 import React from 'react';
 
 import axios from 'axios';
-import dotenv from 'dotenv';
 import ReactDOM from 'react-dom';
 
 import App from './App';
 import './index.css';
-
-dotenv.config();
 
 axios.defaults.baseURL = 'http://localhost:3001';
 
