@@ -1,4 +1,5 @@
 export type Trades = {
+  [key: string]: boolean | string | number;
   _id: string;
   inPosition: boolean;
   price: number;
