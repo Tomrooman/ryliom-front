@@ -23,7 +23,13 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'inPosition', label: 'In position', minWidth: 50, align: 'center' },
+  {
+    id: 'inPosition',
+    label: 'In position',
+    minWidth: 50,
+    align: 'center',
+    format: (value: boolean) => (value ? 'Yes' : 'No'),
+  },
   { id: 'price', label: 'Price', minWidth: 50, align: 'center' },
   {
     id: 'profit',
@@ -94,7 +100,6 @@ const TradesHistoryComponent: FC<tradesHistoryProps> = () => {
 
   const getTradesHistory = async () => {
     const { data } = await axios.get('trades/history');
-    console.log('data : ', data);
     setTradesHistory(data);
   };
 
