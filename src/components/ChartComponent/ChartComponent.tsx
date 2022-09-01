@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef } from 'react';
 
-import { CrosshairMode, createChart } from 'lightweight-charts';
+import { CrosshairMode, SeriesMarker, Time, createChart } from 'lightweight-charts';
 
 type ChartsProps = {
   data: any[][];
@@ -30,6 +30,22 @@ const ChartComponent: FC<ChartsProps> = (props) => {
       let series;
       if (type === 'candle') {
         series = chart.addCandlestickSeries(serieOptions);
+        const markers: SeriesMarker<Time>[] = [];
+        markers.push({
+          time: data[0][3].time,
+          position: 'aboveBar',
+          color: '#e91e63',
+          shape: 'arrowDown',
+          text: 'Sell @ 12',
+        });
+        markers.push({
+          time: data[0][8].time,
+          position: 'belowBar',
+          color: 'green',
+          shape: 'arrowUp',
+          text: 'Buy @ 14',
+        });
+        series.setMarkers(markers);
       } else if (type === 'line') {
         series = chart.addAreaSeries(serieOptions);
       }

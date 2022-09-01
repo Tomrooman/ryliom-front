@@ -12,7 +12,8 @@ const AnalyzeComponent: FC = () => {
   const [chartsData, setChartsData] = useState<
     { time: number; open: number; high: number; low: number; close: number }[]
   >([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentDate, setCurrentDate] = useState('');
   const [pagesInfos, setPagesInfos] = useState<string[]>([]);
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[] }>();
   const [rsiData, setRsiData] = useState<number[]>();
@@ -22,15 +23,28 @@ const AnalyzeComponent: FC = () => {
   }, []);
 
   useEffect(() => {
-    getCandles();
+    if (currentPage) {
+      getCandles();
+      setCurrentDate(
+        pagesInfos[currentPage - 1].substring(
+          pagesInfos[currentPage - 1].indexOf('BTCUSD') + 6,
+          pagesInfos[currentPage - 1].indexOf('BTCUSD') + 16,
+        ),
+      );
+    }
   }, [currentPage]);
 
   useEffect(() => {
     if (chartsData.length) {
       getMACD();
       getRSI();
+      getTradesForCurrentDate();
     }
   }, [chartsData]);
+
+  const getTradesForCurrentDate = async () => {
+    const { data } = await axios.get(`trades/date/${currentDate}`);
+  };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -47,6 +61,7 @@ const AnalyzeComponent: FC = () => {
   const getMaxCandles = async () => {
     const { data } = await axios.get('pages/infos');
     setPagesInfos(data);
+    setCurrentPage(1);
   };
 
   const getCandles = async () => {
@@ -82,7 +97,7 @@ const AnalyzeComponent: FC = () => {
           <button type="button" onClick={handleNextPage}>
             Next
           </button>
-          <p>{pagesInfos[currentPage - 1]}</p>
+          <p>{currentDate}</p>
         </div>
         <ChartComponent
           type="candle"
