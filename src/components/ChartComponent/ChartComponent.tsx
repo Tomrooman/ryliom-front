@@ -31,13 +31,13 @@ const ChartComponent: FC<ChartsProps> = (props) => {
       let series;
       if (type === 'candle') {
         series = chart.addCandlestickSeries(serieOptions);
-        if (markers) {
-          series.setMarkers(markers);
-        }
       } else if (type === 'line') {
         series = chart.addAreaSeries(serieOptions);
       }
       series?.setData(data[index]);
+      if (markers && series && index === seriesOptions.length - 1) {
+        series.setMarkers(markers);
+      }
     });
 
     window.addEventListener('resize', handleResize);

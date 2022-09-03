@@ -9,6 +9,11 @@ import { Trades } from '../../@types/trades';
 import ChartComponent from '../ChartComponent/ChartComponent';
 import style from './AnalyzeComponent.module.css';
 
+const sellProfit = '#e91e63';
+const sellLoss = 'black';
+const buyProfit = '#2AB849';
+const buyLoss = 'black';
+
 const AnalyzeComponent: FC = () => {
   const [chartsData, setChartsData] = useState<
     { time: number; open: number; high: number; low: number; close: number }[]
@@ -44,24 +49,41 @@ const AnalyzeComponent: FC = () => {
     }
   }, [chartsData]);
 
+  const getTradeMarkerColor = (trade: Trades) => {
+    if (trade.type === 'sell') {
+      return trade.profit > 0 ? sellProfit : sellLoss;
+    }
+    return trade.profit > 0 ? buyProfit : buyLoss;
+  };
+
+  const getTradeMarkerPosition = (trade: Trades) => {
+    if (trade.type === 'sell') {
+      return trade.profit > 0 ? 'belowBar' : 'aboveBar';
+    }
+    return trade.profit > 0 ? 'aboveBar' : 'belowBar';
+  };
+
   const getTradesForCurrentDate = async () => {
     const { data } = await axios.get(`trades/date/${currentDate}`);
+    // console.log('data : ', data);
     const formattedMarkers: SeriesMarker<Time>[] = [];
     data.forEach((trade: Trades, index: number) => {
       formattedMarkers.push({
         time: trade.inAt,
         position: trade.type === 'sell' ? 'aboveBar' : 'belowBar',
-        color: trade.type === 'sell' ? '#e91e63' : 'green',
+        color: getTradeMarkerColor(trade),
         shape: trade.type === 'sell' ? 'arrowDown' : 'arrowUp',
         text: `${trade.type === 'sell' ? 'Sell' : 'Buy'} @ ${index}`,
       });
-      formattedMarkers.push({
-        time: trade.outAt,
-        position: trade.type === 'sell' ? 'belowBar' : 'aboveBar',
-        color: trade.type === 'sell' ? '#e91e63' : 'green',
-        shape: 'circle',
-        text: `Close trade @ ${index}`,
-      });
+      if (trade.outAt) {
+        formattedMarkers.push({
+          time: trade.outAt,
+          position: getTradeMarkerPosition(trade),
+          color: getTradeMarkerColor(trade),
+          shape: 'circle',
+          text: `Close trade @ ${index}`,
+        });
+      }
     });
     setMarkers(formattedMarkers);
   };
@@ -179,6 +201,7 @@ const AnalyzeComponent: FC = () => {
               value: d,
             })),
           ]}
+          markers={markers}
         />
         <ChartComponent
           type="line"
@@ -208,6 +231,7 @@ const AnalyzeComponent: FC = () => {
               value: d,
             })),
           ]}
+          markers={markers}
         />
       </>
     );
