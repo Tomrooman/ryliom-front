@@ -1,10 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import axios from 'axios';
-import { ColorType } from 'lightweight-charts';
+import { ColorType, SeriesMarker, Time } from 'lightweight-charts';
 
 import { Candle } from '../../@types/candle';
 import { MacdData } from '../../@types/macd';
+import { Trades } from '../../@types/trades';
 import ChartComponent from '../ChartComponent/ChartComponent';
 import style from './AnalyzeComponent.module.css';
 
@@ -15,6 +16,7 @@ const AnalyzeComponent: FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [currentDate, setCurrentDate] = useState('');
   const [pagesInfos, setPagesInfos] = useState<string[]>([]);
+  const [markers, setMarkers] = useState<SeriesMarker<Time>[]>();
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[] }>();
   const [rsiData, setRsiData] = useState<number[]>();
 
@@ -44,6 +46,24 @@ const AnalyzeComponent: FC = () => {
 
   const getTradesForCurrentDate = async () => {
     const { data } = await axios.get(`trades/date/${currentDate}`);
+    const formattedMarkers: SeriesMarker<Time>[] = [];
+    data.forEach((trade: Trades, index: number) => {
+      formattedMarkers.push({
+        time: trade.inAt,
+        position: trade.type === 'sell' ? 'aboveBar' : 'belowBar',
+        color: trade.type === 'sell' ? '#e91e63' : 'green',
+        shape: trade.type === 'sell' ? 'arrowDown' : 'arrowUp',
+        text: `${trade.type === 'sell' ? 'Sell' : 'Buy'} @ ${index}`,
+      });
+      formattedMarkers.push({
+        time: trade.outAt,
+        position: trade.type === 'sell' ? 'belowBar' : 'aboveBar',
+        color: trade.type === 'sell' ? '#e91e63' : 'green',
+        shape: 'circle',
+        text: `Close trade @ ${index}`,
+      });
+    });
+    setMarkers(formattedMarkers);
   };
 
   const handlePrevPage = () => {
@@ -118,6 +138,7 @@ const AnalyzeComponent: FC = () => {
             },
           ]}
           data={[chartsData]}
+          markers={markers}
         />
         <ChartComponent
           type="line"
