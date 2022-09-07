@@ -3,11 +3,12 @@ import React, { FC, useEffect, useState } from 'react';
 import axios from 'axios';
 import { ColorType, SeriesMarker, Time } from 'lightweight-charts';
 
-import { Candle } from '../../@types/candle';
-import { MacdData } from '../../@types/macd';
-import { Trades } from '../../@types/trades';
 import ChartComponent from '../ChartComponent/ChartComponent';
 import style from './AnalyzeComponent.module.css';
+
+import { Candle } from 'types/candle';
+import { MacdData } from 'types/macd';
+import { Trades } from 'types/trades';
 
 const sellProfit = '#e91e63';
 const sellLoss = 'black';
@@ -45,6 +46,7 @@ const AnalyzeComponent: FC = () => {
     if (chartsData.length) {
       getMACD();
       getRSI();
+      getPivotPoint();
       getTradesForCurrentDate();
     }
   }, [chartsData]);
@@ -126,6 +128,11 @@ const AnalyzeComponent: FC = () => {
   const getRSI = async () => {
     const { data }: { data: number[] } = await axios.get(`/rsi/${currentPage}`);
     setRsiData(data);
+  };
+
+  const getPivotPoint = async () => {
+    const { data } = await axios.get(`/pivotPoint/${currentDate}`);
+    console.log('pivot point : ', data);
   };
 
   if (chartsData.length && macdData?.macdBlue.length && macdData.macdSignalRed.length && rsiData?.length) {

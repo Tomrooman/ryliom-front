@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef } from 'react';
 
-import { CrosshairMode, SeriesMarker, Time, createChart } from 'lightweight-charts';
+import { CrosshairMode, PriceLineOptions, SeriesMarker, Time, createChart } from 'lightweight-charts';
 
 type ChartsProps = {
   data: any[][];
@@ -31,6 +31,17 @@ const ChartComponent: FC<ChartsProps> = (props) => {
       let series;
       if (type === 'candle') {
         series = chart.addCandlestickSeries(serieOptions);
+        const lineWidth = 2;
+        const minPriceLine: PriceLineOptions = {
+          price: data[index][0].close,
+          color: '#ef5350',
+          lineWidth,
+          lineStyle: 2, // LineStyle.Dashed
+          axisLabelVisible: true,
+          lineVisible: true,
+          title: 'min price',
+        };
+        series.createPriceLine(minPriceLine);
       } else if (type === 'line') {
         series = chart.addAreaSeries(serieOptions);
       }

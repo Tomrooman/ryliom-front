@@ -14,7 +14,7 @@
     },
     "rules": {
       "prettier/prettier": [
-        "error",
+        "off",
         {},
         {
           "usePrettierrc": true,
@@ -68,25 +68,25 @@
       "@typescript-eslint/no-shadow": "error",
       "react/require-default-props": "off",
       "import/order": [
-        "error",
-        {
-          // "groups": ["builtin", "external", "internal", "unknown", "parent", "sibling", "index", "object"],
-          // "newlines-between": "always",
-          "groups": ["builtin", "external", "internal", ["parent", "sibling"]],
-          "pathGroups": [
-            {
-              "pattern": "react",
-              "group": "external",
-              "position": "before"
-            }
-          ],
-          "pathGroupsExcludedImportTypes": ["react"],
-          "newlines-between": "always",
-          "alphabetize": {
-            "order": "asc",
-            "caseInsensitive": true
-          }
-        }
+        "off"
+        // "error",
+        // {
+        //   // "groups": ["builtin", "external", "internal", "unknown", "parent", "sibling", "index", "object"],
+        //   "groups": ["builtin", "external", "internal", ["parent", "sibling"]],
+        //   "pathGroups": [
+        //     {
+        //       "pattern": "react",
+        //       "group": "external",
+        //       "position": "before"
+        //     }
+        //   ],
+        //   "pathGroupsExcludedImportTypes": ["react"],
+        //   "newlines-between": "always",
+        //   "alphabetize": {
+        //     "order": "asc",
+        //     "caseInsensitive": true
+        //   }
+        // }
       ]
     },
     "settings": {
@@ -101,7 +101,13 @@
         "node": {
           "extensions": [".js", ".jsx", ".ts", ".tsx"],
           "paths": ["./src"]
-        }
+        },
+        "eslint-import-resolver-custom-alias": {
+          "alias": {
+              "types": "./src/@types"
+          },
+          "extensions": [".ts"]
+      }
       }
     },
     "parser": "@typescript-eslint/parser"
