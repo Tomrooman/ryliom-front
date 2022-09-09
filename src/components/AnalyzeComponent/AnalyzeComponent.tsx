@@ -1,13 +1,15 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, ReactElement, useEffect, useState } from 'react';
 
+import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import axios from 'axios';
 import { ColorType, SeriesMarker, Time } from 'lightweight-charts';
 
 import ChartComponent from '../ChartComponent/ChartComponent';
-import style from './AnalyzeComponent.module.css';
+import styles from './AnalyzeComponent.module.scss';
 
 import { Candle } from 'types/candle';
 import { MacdData } from 'types/macd';
+import { PivotPoint } from 'types/pivotPoint';
 import { Trades } from 'types/trades';
 
 const sellProfit = '#e91e63';
@@ -25,6 +27,7 @@ const AnalyzeComponent: FC = () => {
   const [markers, setMarkers] = useState<SeriesMarker<Time>[]>();
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[] }>();
   const [rsiData, setRsiData] = useState<number[]>();
+  const [pivotPointData, setPivotPointData] = useState<PivotPoint>();
 
   useEffect(() => {
     getMaxCandles();
@@ -33,12 +36,7 @@ const AnalyzeComponent: FC = () => {
   useEffect(() => {
     if (currentPage) {
       getCandles();
-      setCurrentDate(
-        pagesInfos[currentPage - 1].substring(
-          pagesInfos[currentPage - 1].indexOf('BTCUSD') + 6,
-          pagesInfos[currentPage - 1].indexOf('BTCUSD') + 16,
-        ),
-      );
+      setCurrentDate(getDateFromPagesInfo(pagesInfos[currentPage - 1]));
     }
   }, [currentPage]);
 
@@ -50,6 +48,9 @@ const AnalyzeComponent: FC = () => {
       getTradesForCurrentDate();
     }
   }, [chartsData]);
+
+  const getDateFromPagesInfo = (pageInfos: string) =>
+    pageInfos.substring(pageInfos.indexOf('BTCUSD') + 6, pageInfos.indexOf('BTCUSD') + 16);
 
   const getTradeMarkerColor = (trade: Trades) => {
     if (trade.type === 'sell') {
@@ -132,21 +133,48 @@ const AnalyzeComponent: FC = () => {
 
   const getPivotPoint = async () => {
     const { data } = await axios.get(`/pivotPoint/${currentDate}`);
+    if (data) {
+      setPivotPointData(data);
+    }
     console.log('pivot point : ', data);
   };
+
+  const renderAllDatesList = (): ReactElement => (
+    <div>
+      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+        <InputLabel id="date">Date</InputLabel>
+        <Select
+          labelId="date"
+          id="date"
+          value={String(currentPage)}
+          label="Date"
+          onChange={(event: SelectChangeEvent) => setCurrentPage(Number(event.target.value))}
+        >
+          {pagesInfos.map((pageInfos: string, index: number) => (
+            <MenuItem key={pageInfos} value={index + 1}>
+              {getDateFromPagesInfo(pageInfos)}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  );
 
   if (chartsData.length && macdData?.macdBlue.length && macdData.macdSignalRed.length && rsiData?.length) {
     return (
       <>
-        <div className={style.pageInfos}>
-          <button type="button" onClick={handlePrevPage}>
+        <div className={styles.pageInfos}>
+          <Button size="small" variant="contained" onClick={handlePrevPage}>
             Prev
-          </button>
-          {currentPage} / {pagesInfos.length}
-          <button type="button" onClick={handleNextPage}>
+          </Button>
+          <span className={styles.pagePosition}>
+            {currentPage} / {pagesInfos.length}
+          </span>
+          <Button size="small" variant="contained" onClick={handleNextPage}>
             Next
-          </button>
-          <p>{currentDate}</p>
+          </Button>
+          {/* <p>{currentDate}</p> */}
+          {renderAllDatesList()}
         </div>
         <ChartComponent
           type="candle"
@@ -168,6 +196,7 @@ const AnalyzeComponent: FC = () => {
           ]}
           data={[chartsData]}
           markers={markers}
+          pivotPoint={pivotPointData}
         />
         <ChartComponent
           type="line"

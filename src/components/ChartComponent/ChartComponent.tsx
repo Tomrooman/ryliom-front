@@ -1,6 +1,8 @@
 import React, { FC, useEffect, useRef } from 'react';
 
-import { CrosshairMode, PriceLineOptions, SeriesMarker, Time, createChart } from 'lightweight-charts';
+import { CrosshairMode, ISeriesApi, PriceLineOptions, SeriesMarker, Time, createChart } from 'lightweight-charts';
+
+import { PivotPoint } from 'types/pivotPoint';
 
 type ChartsProps = {
   data: any[][];
@@ -9,10 +11,11 @@ type ChartsProps = {
   chartsOptions: any;
   seriesOptions: any[];
   markers?: SeriesMarker<Time>[];
+  pivotPoint?: PivotPoint;
 };
 
 const ChartComponent: FC<ChartsProps> = (props) => {
-  const { data, type, height, chartsOptions, seriesOptions, markers } = props;
+  const { data, type, height, chartsOptions, seriesOptions, markers, pivotPoint } = props;
   const chartContainerRef: any = useRef();
   useEffect(() => {
     const handleResize = (): void => {
@@ -31,23 +34,15 @@ const ChartComponent: FC<ChartsProps> = (props) => {
       let series;
       if (type === 'candle') {
         series = chart.addCandlestickSeries(serieOptions);
-        const lineWidth = 2;
-        const minPriceLine: PriceLineOptions = {
-          price: data[index][0].close,
-          color: '#ef5350',
-          lineWidth,
-          lineStyle: 2, // LineStyle.Dashed
-          axisLabelVisible: true,
-          lineVisible: true,
-          title: 'min price',
-        };
-        series.createPriceLine(minPriceLine);
       } else if (type === 'line') {
         series = chart.addAreaSeries(serieOptions);
       }
       series?.setData(data[index]);
       if (markers && series && index === seriesOptions.length - 1) {
         series.setMarkers(markers);
+      }
+      if (pivotPoint && series && index === seriesOptions.length - 1) {
+        createPivotPoint(series, pivotPoint);
       }
     });
 
@@ -59,6 +54,22 @@ const ChartComponent: FC<ChartsProps> = (props) => {
       chart.remove();
     };
   }, [data, type, height, seriesOptions, chartsOptions]);
+
+  const createPivotPoint = (series: ISeriesApi<'Candlestick'> | ISeriesApi<'Area'>, pivotPointData: PivotPoint) => {
+    const lineWidth = 2;
+    Object.keys(pivotPointData).forEach((key: string) => {
+      const minPriceLine: PriceLineOptions = {
+        price: pivotPointData[key],
+        color: '#ef5350',
+        lineWidth,
+        lineStyle: 2, // LineStyle.Dashed
+        axisLabelVisible: true,
+        lineVisible: true,
+        title: key,
+      };
+      series.createPriceLine(minPriceLine);
+    });
+  };
 
   return <div ref={chartContainerRef} />;
 };
