@@ -6,7 +6,6 @@ import { PivotPoint } from 'types/pivotPoint';
 
 type ChartsProps = {
   data: any[][];
-  type: string;
   height: number;
   chartsOptions: any;
   seriesOptions: any[];
@@ -15,7 +14,7 @@ type ChartsProps = {
 };
 
 const ChartComponent: FC<ChartsProps> = (props) => {
-  const { data, type, height, chartsOptions, seriesOptions, markers, pivotPoint } = props;
+  const { data, height, chartsOptions, seriesOptions, markers, pivotPoint } = props;
   const chartContainerRef: any = useRef();
   useEffect(() => {
     const handleResize = (): void => {
@@ -32,10 +31,12 @@ const ChartComponent: FC<ChartsProps> = (props) => {
     chart.timeScale().fitContent();
     seriesOptions.forEach((serieOptions, index) => {
       let series;
-      if (type === 'candle') {
+      if (serieOptions.type === 'candle') {
         series = chart.addCandlestickSeries(serieOptions);
-      } else if (type === 'line') {
+      } else if (serieOptions.type === 'line') {
         series = chart.addAreaSeries(serieOptions);
+      } else if (serieOptions.type === 'histogram') {
+        series = chart.addHistogramSeries(serieOptions);
       }
       series?.setData(data[index]);
       if (markers && series && index === seriesOptions.length - 1) {
@@ -53,9 +54,12 @@ const ChartComponent: FC<ChartsProps> = (props) => {
 
       chart.remove();
     };
-  }, [data, type, height, seriesOptions, chartsOptions]);
+  }, [data, height, seriesOptions, chartsOptions]);
 
-  const createPivotPoint = (series: ISeriesApi<'Candlestick'> | ISeriesApi<'Area'>, pivotPointData: PivotPoint) => {
+  const createPivotPoint = (
+    series: ISeriesApi<'Candlestick'> | ISeriesApi<'Area'> | ISeriesApi<'Histogram'>,
+    pivotPointData: PivotPoint,
+  ) => {
     const lineWidth = 2;
     Object.keys(pivotPointData).forEach((key: string) => {
       const minPriceLine: PriceLineOptions = {

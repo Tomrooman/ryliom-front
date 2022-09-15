@@ -25,7 +25,7 @@ const AnalyzeComponent: FC = () => {
   const [currentDate, setCurrentDate] = useState('');
   const [pagesInfos, setPagesInfos] = useState<string[]>([]);
   const [markers, setMarkers] = useState<SeriesMarker<Time>[]>();
-  const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[] }>();
+  const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[]; macdHistogram: number[] }>();
   const [rsiData, setRsiData] = useState<number[]>();
   const [pivotPointData, setPivotPointData] = useState<PivotPoint>();
 
@@ -68,7 +68,6 @@ const AnalyzeComponent: FC = () => {
 
   const getTradesForCurrentDate = async () => {
     const { data } = await axios.get(`trades/date/${currentDate}`);
-    // console.log('data : ', data);
     const formattedMarkers: SeriesMarker<Time>[] = [];
     data.forEach((trade: Trades, index: number) => {
       formattedMarkers.push({
@@ -123,7 +122,7 @@ const AnalyzeComponent: FC = () => {
 
   const getMACD = async () => {
     const { data }: { data: MacdData } = await axios.get(`/macd/${currentPage}`);
-    setMacdData({ macdBlue: data.macdBlue, macdSignalRed: data.macdSignalRed });
+    setMacdData({ macdBlue: data.macdBlue, macdSignalRed: data.macdSignalRed, macdHistogram: data.macdHistogram });
   };
 
   const getRSI = async () => {
@@ -136,7 +135,6 @@ const AnalyzeComponent: FC = () => {
     if (data) {
       setPivotPointData(data);
     }
-    console.log('pivot point : ', data);
   };
 
   const renderAllDatesList = (): ReactElement => (
@@ -177,7 +175,6 @@ const AnalyzeComponent: FC = () => {
           {renderAllDatesList()}
         </div>
         <ChartComponent
-          type="candle"
           height={400}
           chartsOptions={{
             timeScale: {
@@ -187,6 +184,7 @@ const AnalyzeComponent: FC = () => {
           }}
           seriesOptions={[
             {
+              type: 'candle',
               upColor: '#26a69a',
               downColor: '#ef5350',
               borderVisible: false,
@@ -199,7 +197,6 @@ const AnalyzeComponent: FC = () => {
           pivotPoint={pivotPointData}
         />
         <ChartComponent
-          type="line"
           height={150}
           chartsOptions={{
             timeScale: {
@@ -213,6 +210,7 @@ const AnalyzeComponent: FC = () => {
           }}
           seriesOptions={[
             {
+              type: 'line',
               backgroundColor: 'white',
               lineColor: '#3B55FE',
               textColor: 'black',
@@ -220,11 +218,15 @@ const AnalyzeComponent: FC = () => {
               bottomColor: 'rgba(0, 0, 0, 0)',
             },
             {
+              type: 'line',
               backgroundColor: 'white',
               lineColor: '#D63413',
               textColor: 'black',
               topColor: 'rgba(0, 0, 0, 0)',
               bottomColor: 'rgba(0, 0, 0, 0)',
+            },
+            {
+              type: 'histogram',
             },
           ]}
           data={[
@@ -236,11 +238,14 @@ const AnalyzeComponent: FC = () => {
               time: chartsData[i + 19].time,
               value: d,
             })),
+            macdData.macdHistogram.map((d, i) => ({
+              time: chartsData[i + 19].time,
+              value: d,
+            })),
           ]}
           markers={markers}
         />
         <ChartComponent
-          type="line"
           height={150}
           chartsOptions={{
             timeScale: {
@@ -254,6 +259,7 @@ const AnalyzeComponent: FC = () => {
           }}
           seriesOptions={[
             {
+              type: 'line',
               backgroundColor: 'white',
               lineColor: '#3B55FE',
               textColor: 'black',
