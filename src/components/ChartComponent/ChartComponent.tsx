@@ -39,7 +39,7 @@ const ChartComponent: FC<ChartsProps> = (props) => {
         series = chart.addHistogramSeries(serieOptions);
       }
       series?.setData(data[index]);
-      if (markers && series && index === seriesOptions.length - 1) {
+      if (markers && series && index === 0) {
         series.setMarkers(markers);
       }
       if (pivotPoint && series && index === seriesOptions.length - 1) {

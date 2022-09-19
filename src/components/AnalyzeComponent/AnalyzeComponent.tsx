@@ -28,6 +28,7 @@ const AnalyzeComponent: FC = () => {
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[]; macdHistogram: number[] }>();
   const [rsiData, setRsiData] = useState<number[]>();
   const [pivotPointData, setPivotPointData] = useState<PivotPoint>();
+  const [smaData, setSmaData] = useState<number[]>([]);
 
   useEffect(() => {
     getMaxCandles();
@@ -45,6 +46,7 @@ const AnalyzeComponent: FC = () => {
       getMACD();
       getRSI();
       getPivotPoint();
+      getSMA();
       getTradesForCurrentDate();
     }
   }, [chartsData]);
@@ -137,6 +139,14 @@ const AnalyzeComponent: FC = () => {
     }
   };
 
+  const getSMA = async () => {
+    const { data } = await axios.get(`/sma/${currentDate}`);
+    console.log('sma data : ', data);
+    if (data) {
+      setSmaData(data);
+    }
+  };
+
   const renderAllDatesList = (): ReactElement => (
     <div>
       <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
@@ -191,8 +201,17 @@ const AnalyzeComponent: FC = () => {
               wickUpColor: '#26a69a',
               wickDownColor: '#ef5350',
             },
+            {
+              type: 'line',
+            },
           ]}
-          data={[chartsData]}
+          data={[
+            chartsData,
+            smaData.map((d, i) => ({
+              time: chartsData[i].time,
+              value: d,
+            })),
+          ]}
           markers={markers}
           pivotPoint={pivotPointData}
         />
@@ -269,7 +288,7 @@ const AnalyzeComponent: FC = () => {
           ]}
           data={[
             rsiData.map((d, i) => ({
-              time: chartsData[i + 12].time,
+              time: chartsData[i + 13].time,
               value: d,
             })),
           ]}
