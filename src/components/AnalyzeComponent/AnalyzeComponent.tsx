@@ -28,7 +28,7 @@ const AnalyzeComponent: FC = () => {
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[]; macdHistogram: number[] }>();
   const [rsiData, setRsiData] = useState<number[]>();
   const [pivotPointData, setPivotPointData] = useState<PivotPoint>();
-  const [smaData, setSmaData] = useState<number[]>([]);
+  const [emaData, setEmaData] = useState<number[]>([]);
 
   useEffect(() => {
     getMaxCandles();
@@ -46,7 +46,7 @@ const AnalyzeComponent: FC = () => {
       getMACD();
       getRSI();
       getPivotPoint();
-      getSMA();
+      getEMA();
       getTradesForCurrentDate();
     }
   }, [chartsData]);
@@ -61,12 +61,7 @@ const AnalyzeComponent: FC = () => {
     return trade.profit > 0 ? buyProfit : buyLoss;
   };
 
-  const getTradeMarkerPosition = (trade: Trades) => {
-    if (trade.type === 'sell') {
-      return trade.profit > 0 ? 'belowBar' : 'aboveBar';
-    }
-    return trade.profit > 0 ? 'aboveBar' : 'belowBar';
-  };
+  const getTradeMarkerPosition = (trade: Trades) => (trade.type === 'sell' ? 'belowBar' : 'aboveBar');
 
   const getTradesForCurrentDate = async () => {
     const { data } = await axios.get(`trades/date/${currentDate}`);
@@ -139,11 +134,10 @@ const AnalyzeComponent: FC = () => {
     }
   };
 
-  const getSMA = async () => {
-    const { data } = await axios.get(`/sma/${currentDate}`);
-    console.log('sma data : ', data);
+  const getEMA = async () => {
+    const { data } = await axios.get(`/ema/${currentDate}`);
     if (data) {
-      setSmaData(data);
+      setEmaData(data);
     }
   };
 
@@ -203,11 +197,16 @@ const AnalyzeComponent: FC = () => {
             },
             {
               type: 'line',
+              backgroundColor: 'white',
+              lineColor: 'purple',
+              textColor: 'black',
+              topColor: 'rgba(0, 0, 0, 0)',
+              bottomColor: 'rgba(0, 0, 0, 0)',
             },
           ]}
           data={[
             chartsData,
-            smaData.map((d, i) => ({
+            emaData.map((d, i) => ({
               time: chartsData[i].time,
               value: d,
             })),
