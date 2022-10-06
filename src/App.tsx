@@ -4,7 +4,7 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import './App.css';
 import AnalyzeComponent from './components/AnalyzeComponent/AnalyzeComponent';
-import TradesHistoryComponent from './components/TradesHistoryComponent/TradesHistoryComponent';
+import TradesChartsComponent from './components/TradesChartsComponent/TradesChartsComponent';
 
 const Home = (): ReactElement => (
   <div>
@@ -22,8 +22,8 @@ const App: FC = () => (
   <Router>
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/trades" element={<TradesChartsComponent />} />
       <Route path="/analyze" element={<AnalyzeComponent />} />
-      <Route path="/trades" element={<TradesHistoryComponent />} />
     </Routes>
   </Router>
 );

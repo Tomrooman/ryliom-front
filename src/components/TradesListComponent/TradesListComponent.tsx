@@ -1,18 +1,17 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import axios from 'axios';
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+} from '@mui/material';
 
-import { Trades } from '../../@types/trades';
-
-type tradesHistoryProps = unknown;
+import { Trades } from 'types/trades';
 
 interface Column {
   id: string;
@@ -89,19 +88,11 @@ const columns: readonly Column[] = [
   },
 ];
 
-const TradesHistoryComponent: FC<tradesHistoryProps> = () => {
+type TradesListProps = { tradesHistory: Trades[] };
+
+const TradesListComponent: FC<TradesListProps> = ({ tradesHistory }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [tradesHistory, setTradesHistory] = useState<Trades[]>([]);
-
-  useEffect(() => {
-    getTradesHistory();
-  }, []);
-
-  const getTradesHistory = async () => {
-    const { data } = await axios.get('trades/history');
-    setTradesHistory(data);
-  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -154,4 +145,4 @@ const TradesHistoryComponent: FC<tradesHistoryProps> = () => {
   );
 };
 
-export default TradesHistoryComponent;
+export default TradesListComponent;
