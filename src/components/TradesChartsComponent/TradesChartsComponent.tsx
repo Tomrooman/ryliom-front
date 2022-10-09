@@ -1,9 +1,10 @@
 import React, { FC, ReactElement, useEffect, useState } from 'react';
 
 import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import axios from 'axios';
 import { ColorType, SeriesMarker, Time } from 'lightweight-charts';
 
+import axios from '../../api/axios';
+import TradesAPI from '../../api/tradesApi';
 import ChartComponent from '../ChartComponent/ChartComponent';
 import styles from './TradesChartsComponent.module.scss';
 
@@ -64,9 +65,9 @@ const TradesChartsComponent: FC = () => {
   const getTradeMarkerPosition = (trade: Trades) => (trade.type === 'sell' ? 'belowBar' : 'aboveBar');
 
   const getTradesForCurrentDate = async () => {
-    const { data } = await axios.get(`trades/date/${currentDate}`);
+    const trades = await TradesAPI.getTradesByDate(currentDate);
     const formattedMarkers: SeriesMarker<Time>[] = [];
-    data.forEach((trade: Trades, index: number) => {
+    trades.forEach((trade: Trades, index: number) => {
       formattedMarkers.push({
         time: trade.inAt,
         position: trade.type === 'sell' ? 'aboveBar' : 'belowBar',

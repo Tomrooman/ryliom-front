@@ -72,20 +72,6 @@ const columns: readonly Column[] = [
     align: 'center',
     // format: (value: number) => value.toFixed(2),
   },
-  {
-    id: 'createdAt',
-    label: 'Created at',
-    // minWidth: 170,
-    align: 'center',
-    // format: (value: number) => value.toFixed(2),
-  },
-  {
-    id: 'updatedAt',
-    label: 'Updated at',
-    // minWidth: 170,
-    align: 'center',
-    // format: (value: number) => value.toFixed(2),
-  },
 ];
 
 type TradesListProps = { tradesHistory: Trades[] };
