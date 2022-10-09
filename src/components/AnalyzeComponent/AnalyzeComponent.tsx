@@ -1,10 +1,9 @@
 import React, { FC, ReactElement, useEffect, useState } from 'react';
 
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import axios from 'axios';
-import clsx from 'clsx';
 
 import { Trades } from '../../@types/trades';
+import axios from '../../api/axios';
 import TradesListComponent from '../TradesListComponent/TradesListComponent';
 import styles from './AnalyzeComponent.module.scss';
 
