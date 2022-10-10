@@ -1,9 +1,10 @@
 import React, { FC, ReactElement, useEffect, useState } from 'react';
 
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 import { Trades } from '../../@types/trades';
 import axios from '../../api/axios';
+import TradesAPI from '../../api/tradesApi';
 import TradesListComponent from '../TradesListComponent/TradesListComponent';
 import styles from './AnalyzeComponent.module.scss';
 
@@ -11,6 +12,7 @@ type AnalyzeProps = unknown;
 
 const AnalyzeComponent: FC<AnalyzeProps> = () => {
   const [tradesHistory, setTradesHistory] = useState<Trades[]>([]);
+  const [filteredTrades, setFilteredTrades] = useState<Trades[]>([]);
   const [pagesInfos, setPagesInfos] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
@@ -22,13 +24,35 @@ const AnalyzeComponent: FC<AnalyzeProps> = () => {
   }, []);
 
   const getTradesHistory = async () => {
-    const { data } = await axios.get('trades/history');
+    const data = await TradesAPI.getTradesHistory();
     setTradesHistory(data);
   };
 
   const getMaxCandles = async () => {
     const { data } = await axios.get('pages/infos');
     setPagesInfos(data);
+  };
+
+  const applyDateFilter = () => {
+    const filtered = tradesHistory.filter((trade) => {
+      if (trade.inAt && trade.outAt) {
+        const year = selectedYear === 'all' ? '' : selectedYear;
+        const month = selectedMonth === 'all' ? '' : selectedMonth;
+        const day = selectedDay === 'all' ? '' : selectedDay;
+        const inSplitted = trade.inAt.split('-');
+        const outSplitted = trade.outAt.split('-');
+        return (
+          (inSplitted[0].indexOf(year) !== -1 &&
+            inSplitted[1].indexOf(month) !== -1 &&
+            inSplitted[2].indexOf(day) !== -1) ||
+          (outSplitted[0].indexOf(year) !== -1 &&
+            outSplitted[1].indexOf(month) !== -1 &&
+            outSplitted[2].indexOf(day) !== -1)
+        );
+      }
+      return false;
+    });
+    setFilteredTrades(filtered);
   };
 
   const getDateFromPagesInfo = (pageInfos: string) =>
@@ -105,9 +129,10 @@ const AnalyzeComponent: FC<AnalyzeProps> = () => {
         {renderChoices('Year', selectedYear, getYearChoicesFromDate, setSelectedYear)}
         {renderChoices('Month', selectedMonth, getMonthChoicesFromDateByYear, setSelectedMonth)}
         {renderChoices('Day', selectedDay, getDayChoicesFromDateByMonth, setSelectedDay)}
+        <Button onClick={applyDateFilter}>Confirmer</Button>
       </div>
       <div className={styles.tradesContainer}>
-        <TradesListComponent tradesHistory={tradesHistory} />
+        <TradesListComponent tradesHistory={filteredTrades} />
       </div>
     </div>
   );
