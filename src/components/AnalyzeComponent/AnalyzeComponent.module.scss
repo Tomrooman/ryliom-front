@@ -1,5 +1,31 @@
-.analyzeDateSelection {
-    display: flex;
-    align-items: center;
+.analyzeDateContainer {
+    text-align: center;
+    .analyzeDateSelection {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.statisticsContainer {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    border:  1px solid black;
+    width: 80%;
     justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+
+    .statistics {
+        display: flex;
+
+        .statisticsLeft, .statisticsRight {
+            width: 50%;
+            // margin-left: 16px;
+            text-align: center;
+        }
+    }
+    .statisticsTotal {
+        text-align: center;
+    }
 }
