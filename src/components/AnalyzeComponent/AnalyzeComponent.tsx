@@ -172,28 +172,26 @@ const AnalyzeComponent: FC<AnalyzeProps> = () => {
           </Button>
         </div>
       </div>
-      <div className={styles.statisticsContainer}>
-        {stats?.totalTrades ? (
-          <>
-            <div className={styles.statistics}>
-              <div className={styles.statisticsLeft}>
-                <p>Trade(s) gagnant(s): {stats.win.count}</p>
-                <p>Percentage: {stats.win.percentage}</p>
-                <p>Profit: {stats.win.profit}</p>
-              </div>
-              <div className={styles.statisticsRight}>
-                <p>Trade(s) perdant(s): {stats.lose.count}</p>
-                <p>Percentage: {stats.lose.percentage}</p>
-                <p>Perte: {stats.lose.profit}</p>
-              </div>
+      {stats?.totalTrades ? (
+        <div className={styles.statisticsContainer}>
+          <div className={styles.statistics}>
+            <div className={styles.statisticsLeft}>
+              <p>Trade(s) gagnant(s): {stats.win.count}</p>
+              <p>Percentage: {stats.win.percentage}</p>
+              <p>Profit: {stats.win.profit}</p>
             </div>
-            <div className={styles.statisticsTotal}>
+            <div className={styles.statisticsMiddle}>
               <p>Trades: {stats.totalTrades}</p>
               <p>Profit: {stats.profit}</p>
             </div>
-          </>
-        ) : null}
-      </div>
+            <div className={styles.statisticsRight}>
+              <p>Trade(s) perdant(s): {stats.lose.count}</p>
+              <p>Percentage: {stats.lose.percentage}</p>
+              <p>Perte: {stats.lose.profit}</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className={styles.tradesContainer}>
         <TradesListComponent tradesHistory={filteredTrades} />
       </div>

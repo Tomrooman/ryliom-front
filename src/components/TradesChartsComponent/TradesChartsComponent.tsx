@@ -13,6 +13,7 @@ import { MacdData } from 'types/macd';
 import { PivotPoint } from 'types/pivotPoint';
 import { Trades } from 'types/trades';
 
+const SYMBOL = 'BTCUSDT';
 const sellProfit = '#e91e63';
 const sellLoss = 'black';
 const buyProfit = '#2AB849';
@@ -129,7 +130,7 @@ const TradesChartsComponent: FC = () => {
   };
 
   const getPivotPoint = async () => {
-    const { data } = await axios.get(`/pivotPoint/${currentDate}`);
+    const { data } = await axios.get(`/pivotPoint/${currentDate}/${SYMBOL}`);
     if (data) {
       setPivotPointData(data);
     }
