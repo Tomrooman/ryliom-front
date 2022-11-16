@@ -57,13 +57,13 @@ const TradesChartsComponent: FC = () => {
     pageInfos.substring(pageInfos.indexOf('BTCUSD') + 6, pageInfos.indexOf('BTCUSD') + 16);
 
   const getTradeMarkerColor = (trade: Trades) => {
-    if (trade.type === 'sell') {
+    if (trade.type === 'Sell') {
       return trade.profit > 0 ? sellProfit : sellLoss;
     }
     return trade.profit > 0 ? buyProfit : buyLoss;
   };
 
-  const getTradeMarkerPosition = (trade: Trades) => (trade.type === 'sell' ? 'belowBar' : 'aboveBar');
+  const getTradeMarkerPosition = (trade: Trades) => (trade.type === 'Sell' ? 'belowBar' : 'aboveBar');
 
   const getTradesForCurrentDate = async () => {
     const trades = await TradesAPI.getTradesByDate(currentDate);
@@ -71,10 +71,10 @@ const TradesChartsComponent: FC = () => {
     trades.forEach((trade: Trades, index: number) => {
       formattedMarkers.push({
         time: trade.inAt,
-        position: trade.type === 'sell' ? 'aboveBar' : 'belowBar',
+        position: trade.type === 'Sell' ? 'aboveBar' : 'belowBar',
         color: getTradeMarkerColor(trade),
-        shape: trade.type === 'sell' ? 'arrowDown' : 'arrowUp',
-        text: `${trade.type === 'sell' ? 'Sell' : 'Buy'} @ ${index}`,
+        shape: trade.type === 'Sell' ? 'arrowDown' : 'arrowUp',
+        text: `${trade.type === 'Sell' ? 'Sell' : 'Buy'} @ ${index}`,
       });
       if (trade.outAt) {
         formattedMarkers.push({
