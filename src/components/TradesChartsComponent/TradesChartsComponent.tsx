@@ -11,6 +11,7 @@ import styles from './TradesChartsComponent.module.scss';
 import { Candle } from 'types/candle';
 import { MacdData } from 'types/macd';
 import { PivotPoint } from 'types/pivotPoint';
+// import { StochasticData } from 'types/stochastic';
 import { Trades } from 'types/trades';
 
 const SYMBOL = 'BTCUSDT';
@@ -28,9 +29,13 @@ const TradesChartsComponent: FC = () => {
   const [pagesInfos, setPagesInfos] = useState<string[]>([]);
   const [markers, setMarkers] = useState<SeriesMarker<Time>[]>();
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[]; macdHistogram: number[] }>();
-  const [rsiData, setRsiData] = useState<number[]>();
+  // const [rsiData, setRsiData] = useState<{ time: number; value: number }[]>();
+  // const [stoch, setStochData] = useState<StochasticData[]>([]);
   const [pivotPointData, setPivotPointData] = useState<PivotPoint>();
-  const [emaData, setEmaData] = useState<number[]>([]);
+  const [vwma, setVwmaData] = useState<{ time: number; value: number }[]>([]);
+  const [vwma100, setVwmaData100] = useState<{ time: number; value: number }[]>([]);
+  // const [emaData, setEmaData] = useState<{ time: number; value: number }[]>([]);
+  // const [emaSignalData, setEmaSignalData] = useState<{ time: number; value: number }[]>([]);
 
   useEffect(() => {
     getMaxCandles();
@@ -46,15 +51,19 @@ const TradesChartsComponent: FC = () => {
   useEffect(() => {
     if (chartsData.length) {
       getMACD();
-      getRSI();
+      // getRSI();
+      // getStochData();
       getPivotPoint();
-      getEMA();
+      // getEMA();
+      // getEMA50();
+      getVwma();
+      getVwma100();
       getTradesForCurrentDate();
     }
   }, [chartsData]);
 
   const getDateFromPagesInfo = (pageInfos: string) =>
-    pageInfos.substring(pageInfos.indexOf('BTCUSD') + 6, pageInfos.indexOf('BTCUSD') + 16);
+    pageInfos.substring(pageInfos.indexOf('BTCUSDT-1m-') + 11, pageInfos.indexOf('.json'));
 
   const getTradeMarkerColor = (trade: Trades) => {
     if (trade.type === 'Sell') {
@@ -124,24 +133,47 @@ const TradesChartsComponent: FC = () => {
     setMacdData({ macdBlue: data.macdBlue, macdSignalRed: data.macdSignalRed, macdHistogram: data.macdHistogram });
   };
 
-  const getRSI = async () => {
-    const { data }: { data: number[] } = await axios.get(`/rsi/${currentPage}`);
-    setRsiData(data);
+  const getVwma = async () => {
+    const { data }: { data: { time: number; value: number }[] } = await axios.get(`/vwma/${currentPage}/50`);
+    setVwmaData(data);
   };
+
+  const getVwma100 = async () => {
+    const { data }: { data: { time: number; value: number }[] } = await axios.get(`/vwma/${currentPage}/100`);
+    setVwmaData100(data);
+  };
+
+  // const getStochData = async () => {
+  //   const { data }: { data: StochasticData[] } = await axios.get(`/stochastic/${currentPage}`);
+  //   setStochData(data);
+  // };
+
+  // const getRSI = async () => {
+  //   const { data }: { data: { time: number; value: number }[] } = await axios.get(`/rsi/${currentPage}`);
+  //   setRsiData(data);
+  // };
 
   const getPivotPoint = async () => {
     const { data } = await axios.get(`/pivotPoint/${currentDate}/${SYMBOL}`);
     if (data) {
+      console.log('piot point : ', data);
       setPivotPointData(data);
     }
   };
 
-  const getEMA = async () => {
-    const { data } = await axios.get(`/ema/${currentDate}`);
-    if (data) {
-      setEmaData(data);
-    }
-  };
+  // const getEMA = async () => {
+  //   const { data } = await axios.get(`/ema/${currentDate}`);
+  //   if (data) {
+  //     setEmaData(data);
+  //   }
+  // };
+
+  // const getEMA50 = async () => {
+  //   const { data } = await axios.get(`/ema/${currentDate}/50`);
+  //   if (data) {
+  //     setEmaSignalData(data);
+  //   }
+  // };
 
   const renderAllDatesList = (): ReactElement => (
     <div>
@@ -164,7 +196,7 @@ const TradesChartsComponent: FC = () => {
     </div>
   );
 
-  if (chartsData.length && macdData?.macdBlue.length && macdData.macdSignalRed.length && rsiData?.length) {
+  if (chartsData.length && macdData?.macdBlue.length && macdData.macdSignalRed.length) {
     return (
       <>
         <div className={styles.pageInfos}>
@@ -205,13 +237,33 @@ const TradesChartsComponent: FC = () => {
               topColor: 'rgba(0, 0, 0, 0)',
               bottomColor: 'rgba(0, 0, 0, 0)',
             },
+            // {
+            //   type: 'line',
+            //   backgroundColor: 'white',
+            //   lineColor: 'red',
+            //   textColor: 'black',
+            //   topColor: 'rgba(0, 0, 0, 0)',
+            //   bottomColor: 'rgba(0, 0, 0, 0)',
+            // },
           ]}
           data={[
             chartsData,
-            emaData.map((d, i) => ({
-              time: chartsData[i].time,
-              value: d,
+            vwma.map((d) => ({
+              time: d.time,
+              value: d.value,
             })),
+            // vwma100.map((d) => ({
+            //   time: d.time,
+            //   value: d.value,
+            // })),
+            // emaData.map((d) => ({
+            //   time: d.time,
+            //   value: d.value,
+            // })),
+            // emaSignalData.map((d) => ({
+            //   time: d.time,
+            //   value: d.value,
+            // })),
           ]}
           markers={markers}
           pivotPoint={pivotPointData}
@@ -245,9 +297,9 @@ const TradesChartsComponent: FC = () => {
               topColor: 'rgba(0, 0, 0, 0)',
               bottomColor: 'rgba(0, 0, 0, 0)',
             },
-            {
-              type: 'histogram',
-            },
+            // {
+            //   type: 'histogram',
+            // },
           ]}
           data={[
             macdData.macdBlue.map((d, i) => ({
@@ -258,14 +310,18 @@ const TradesChartsComponent: FC = () => {
               time: chartsData[i + 19].time,
               value: d,
             })),
-            macdData.macdHistogram.map((d, i) => ({
-              time: chartsData[i + 19].time,
-              value: d,
-            })),
+            // macdData.macdHistogram.map((d, i) => ({
+            //   time: chartsData[i + 19].time,
+            //   value: d,
+            // })),
+            // rsiData.map((d) => ({
+            //   time: d.time,
+            //   value: d.value,
+            // })),
           ]}
           markers={markers}
         />
-        <ChartComponent
+        {/* <ChartComponent
           height={150}
           chartsOptions={{
             timeScale: {
@@ -281,20 +337,36 @@ const TradesChartsComponent: FC = () => {
             {
               type: 'line',
               backgroundColor: 'white',
-              lineColor: '#3B55FE',
-              textColor: 'black',
+              lineColor: 'blue',
+              textColor: 'yellow',
               topColor: 'rgba(0, 0, 0, 0)',
               bottomColor: 'rgba(0, 0, 0, 0)',
             },
+            // {
+            //   type: 'line',
+            //   backgroundColor: 'white',
+            //   lineColor: 'red',
+            //   textColor: 'red',
+            //   topColor: 'rgba(0, 0, 0, 0)',
+            //   bottomColor: 'rgba(0, 0, 0, 0)',
+            // },
           ]}
           data={[
-            rsiData.map((d, i) => ({
-              time: chartsData[i + 13].time,
-              value: d,
+            vwma.map((s) => ({
+              time: s.time,
+              value: s.value,
             })),
+            // stoch.map((s) => ({
+            //   time: s.time,
+            //   value: s.k,
+            // })),
+            // stoch.map((s) => ({
+            //   time: s.time,
+            //   value: s.d,
+            // })),
           ]}
           markers={markers}
-        />
+        /> */}
       </>
     );
   }

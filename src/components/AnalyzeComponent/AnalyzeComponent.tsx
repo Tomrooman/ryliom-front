@@ -92,7 +92,7 @@ const AnalyzeComponent: FC<AnalyzeProps> = () => {
   };
 
   const getDateFromPagesInfo = (pageInfos: string) =>
-    pageInfos.substring(pageInfos.indexOf('BTCUSD') + 6, pageInfos.indexOf('BTCUSD') + 16);
+    pageInfos.substring(pageInfos.indexOf('BTCUSDT-1m-') + 11, pageInfos.indexOf('.json'));
 
   const getYearChoicesFromDate = (): ReactElement[] => {
     let yearChoices = pagesInfos.map((pageInfo: string) => getDateFromPagesInfo(pageInfo).split('-')[0]);
