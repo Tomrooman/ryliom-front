@@ -8,6 +8,7 @@ import TradesAPI from '../../api/tradesApi';
 import ChartComponent from '../ChartComponent/ChartComponent';
 import styles from './TradesChartsComponent.module.scss';
 
+import { BollingerBands } from 'types/bollinger';
 import { Candle } from 'types/candle';
 import { MacdData } from 'types/macd';
 import { PivotPoint } from 'types/pivotPoint';
@@ -29,13 +30,14 @@ const TradesChartsComponent: FC = () => {
   const [pagesInfos, setPagesInfos] = useState<string[]>([]);
   const [markers, setMarkers] = useState<SeriesMarker<Time>[]>();
   const [macdData, setMacdData] = useState<{ macdBlue: number[]; macdSignalRed: number[]; macdHistogram: number[] }>();
-  // const [rsiData, setRsiData] = useState<{ time: number; value: number }[]>();
+  const [rsiData, setRsiData] = useState<{ time: number; value: number }[]>([]);
   // const [stoch, setStochData] = useState<StochasticData[]>([]);
   const [pivotPointData, setPivotPointData] = useState<PivotPoint>();
   const [vwma, setVwmaData] = useState<{ time: number; value: number }[]>([]);
-  const [vwma100, setVwmaData100] = useState<{ time: number; value: number }[]>([]);
+  const [bollinger, setBollinger] = useState<BollingerBands[]>([]);
+  // const [vwma100, setVwmaData100] = useState<{ time: number; value: number }[]>([]);
   // const [emaData, setEmaData] = useState<{ time: number; value: number }[]>([]);
-  // const [emaSignalData, setEmaSignalData] = useState<{ time: number; value: number }[]>([]);
+  const [emaSignalData, setEmaSignalData] = useState<{ time: number; value: number }[]>([]);
 
   useEffect(() => {
     getMaxCandles();
@@ -50,14 +52,15 @@ const TradesChartsComponent: FC = () => {
 
   useEffect(() => {
     if (chartsData.length) {
-      getMACD();
-      // getRSI();
+      // getMACD();
+      getRSI();
       // getStochData();
-      getPivotPoint();
+      // getPivotPoint();
       // getEMA();
-      // getEMA50();
-      getVwma();
-      getVwma100();
+      getEMA50();
+      // getVwma();
+      // getVwma100();
+      getBollingerBands();
       getTradesForCurrentDate();
     }
   }, [chartsData]);
@@ -128,38 +131,44 @@ const TradesChartsComponent: FC = () => {
     setChartsData(formattedData);
   };
 
-  const getMACD = async () => {
-    const { data }: { data: MacdData } = await axios.get(`/macd/${currentPage}`);
-    setMacdData({ macdBlue: data.macdBlue, macdSignalRed: data.macdSignalRed, macdHistogram: data.macdHistogram });
+  // const getMACD = async () => {
+  //   const { data }: { data: MacdData } = await axios.get(`/macd/${currentPage}`);
+  //   setMacdData({ macdBlue: data.macdBlue, macdSignalRed: data.macdSignalRed, macdHistogram: data.macdHistogram });
+  // };
+
+  // const getVwma = async () => {
+  //   const { data }: { data: { time: number; value: number }[] } = await axios.get(`/vwma/${currentPage}/50`);
+  //   setVwmaData(data);
+  // };
+
+  const getBollingerBands = async () => {
+    const { data }: { data: BollingerBands[] } = await axios.get(`/bollinger/${currentPage}`);
+    setBollinger(data);
   };
 
-  const getVwma = async () => {
-    const { data }: { data: { time: number; value: number }[] } = await axios.get(`/vwma/${currentPage}/50`);
-    setVwmaData(data);
-  };
-
-  const getVwma100 = async () => {
-    const { data }: { data: { time: number; value: number }[] } = await axios.get(`/vwma/${currentPage}/100`);
-    setVwmaData100(data);
-  };
+  // const getVwma100 = async () => {
+  //   const { data }: { data: { time: number; value: number }[] } = await axios.get(`/vwma/${currentPage}/100`);
+  //   setVwmaData100(data);
+  // };
 
   // const getStochData = async () => {
   //   const { data }: { data: StochasticData[] } = await axios.get(`/stochastic/${currentPage}`);
   //   setStochData(data);
   // };
 
-  // const getRSI = async () => {
-  //   const { data }: { data: { time: number; value: number }[] } = await axios.get(`/rsi/${currentPage}`);
-  //   setRsiData(data);
-  // };
-
-  const getPivotPoint = async () => {
-    const { data } = await axios.get(`/pivotPoint/${currentDate}/${SYMBOL}`);
-    if (data) {
-      console.log('piot point : ', data);
-      setPivotPointData(data);
-    }
+  const getRSI = async () => {
+    console.log('call rsi');
+    const { data }: { data: { time: number; value: number }[] } = await axios.get(`/rsi/${currentPage}`);
+    console.log('get rsi : ', data.length, chartsData.length);
+    setRsiData(data);
   };
+
+  // const getPivotPoint = async () => {
+  //   const { data } = await axios.get(`/pivotPoint/${currentDate}/${SYMBOL}`);
+  //   if (data) {
+  //     setPivotPointData(data);
+  //   }
+  // };
 
   // const getEMA = async () => {
   //   const { data } = await axios.get(`/ema/${currentDate}`);
@@ -168,12 +177,12 @@ const TradesChartsComponent: FC = () => {
   //   }
   // };
 
-  // const getEMA50 = async () => {
-  //   const { data } = await axios.get(`/ema/${currentDate}/50`);
-  //   if (data) {
-  //     setEmaSignalData(data);
-  //   }
-  // };
+  const getEMA50 = async () => {
+    const { data } = await axios.get(`/ema/${currentDate}/50`);
+    if (data) {
+      setEmaSignalData(data);
+    }
+  };
 
   const renderAllDatesList = (): ReactElement => (
     <div>
@@ -196,7 +205,7 @@ const TradesChartsComponent: FC = () => {
     </div>
   );
 
-  if (chartsData.length && macdData?.macdBlue.length && macdData.macdSignalRed.length) {
+  if (chartsData.length) {
     return (
       <>
         <div className={styles.pageInfos}>
@@ -232,25 +241,53 @@ const TradesChartsComponent: FC = () => {
             {
               type: 'line',
               backgroundColor: 'white',
-              lineColor: 'purple',
+              lineColor: 'blue',
               textColor: 'black',
               topColor: 'rgba(0, 0, 0, 0)',
               bottomColor: 'rgba(0, 0, 0, 0)',
             },
-            // {
-            //   type: 'line',
-            //   backgroundColor: 'white',
-            //   lineColor: 'red',
-            //   textColor: 'black',
-            //   topColor: 'rgba(0, 0, 0, 0)',
-            //   bottomColor: 'rgba(0, 0, 0, 0)',
-            // },
+            {
+              type: 'line',
+              backgroundColor: 'white',
+              lineColor: 'blue',
+              textColor: 'gray',
+              topColor: 'rgba(0, 0, 0, 0)',
+              bottomColor: 'rgba(0, 0, 0, 0)',
+            },
+            {
+              type: 'line',
+              backgroundColor: 'white',
+              lineColor: 'blue',
+              textColor: 'black',
+              topColor: 'rgba(0, 0, 0, 0)',
+              bottomColor: 'rgba(0, 0, 0, 0)',
+            },
+            {
+              type: 'line',
+              backgroundColor: 'white',
+              lineColor: 'black',
+              textColor: 'black',
+              topColor: 'rgba(0, 0, 0, 0)',
+              bottomColor: 'rgba(0, 0, 0, 0)',
+            },
           ]}
           data={[
             chartsData,
-            vwma.map((d) => ({
+            // vwma.map((d) => ({
+            //   time: d.time,
+            //   value: d.value,
+            // })),
+            bollinger.map((d) => ({
               time: d.time,
-              value: d.value,
+              value: d.upper,
+            })),
+            bollinger.map((d) => ({
+              time: d.time,
+              value: d.middle,
+            })),
+            bollinger.map((d) => ({
+              time: d.time,
+              value: d.lower,
             })),
             // vwma100.map((d) => ({
             //   time: d.time,
@@ -260,10 +297,10 @@ const TradesChartsComponent: FC = () => {
             //   time: d.time,
             //   value: d.value,
             // })),
-            // emaSignalData.map((d) => ({
-            //   time: d.time,
-            //   value: d.value,
-            // })),
+            emaSignalData.map((d) => ({
+              time: d.time,
+              value: d.value,
+            })),
           ]}
           markers={markers}
           pivotPoint={pivotPointData}
@@ -289,26 +326,14 @@ const TradesChartsComponent: FC = () => {
               topColor: 'rgba(0, 0, 0, 0)',
               bottomColor: 'rgba(0, 0, 0, 0)',
             },
-            {
-              type: 'line',
-              backgroundColor: 'white',
-              lineColor: '#D63413',
-              textColor: 'black',
-              topColor: 'rgba(0, 0, 0, 0)',
-              bottomColor: 'rgba(0, 0, 0, 0)',
-            },
             // {
             //   type: 'histogram',
             // },
           ]}
           data={[
-            macdData.macdBlue.map((d, i) => ({
-              time: chartsData[i + 19].time,
-              value: d,
-            })),
-            macdData.macdSignalRed.map((d, i) => ({
-              time: chartsData[i + 19].time,
-              value: d,
+            rsiData.map((d, i) => ({
+              time: chartsData[i + 11].time,
+              value: d.value,
             })),
             // macdData.macdHistogram.map((d, i) => ({
             //   time: chartsData[i + 19].time,
